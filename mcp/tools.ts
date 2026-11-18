@@ -73,12 +73,12 @@ export function createMcpServer(send: Send) {
     {
       title: "Search foods",
       description:
-        "Search the Food Tracker food database by name (English names, e.g. 'chicken', 'rice', 'kra pao'). Returns food ids and nutrition per serving. Use this before log_food.",
+        "Search the Food Tracker food database by name. Names are English only: translate Thai or other languages to a short English term first (ไข่ → 'egg', อกไก่ → 'chicken breast', ข้าวมันไก่ → 'khao man gai'). Returns food ids and nutrition per serving. Use this before log_food.",
       inputSchema: { query: z.string().max(80).describe("Part of the food name") },
     },
     safe(async ({ query }) => {
       const foods = await call<Food[]>(`/foods?q=${encodeURIComponent(query)}`);
-      return foods.length ? foods.slice(0, 15).map(foodLine).join("\n") : `No foods match "${query}". Consider add_custom_food.`;
+      return foods.length ? foods.slice(0, 15).map(foodLine).join("\n") : `No foods match "${query}". Retry with a shorter or English term (names are English), then consider add_custom_food.`;
     }),
   );
 
