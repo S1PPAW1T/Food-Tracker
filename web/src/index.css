@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-muted-fg: var(--muted-fg);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-danger: var(--danger);
+  --color-kcal: var(--kcal);
+  --color-protein: var(--protein);
+  --color-carbs: var(--carbs);
+  --color-fat: var(--fat);
+  --color-water: var(--water);
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Barlow", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --bg: #ecfdf5;
+  --card: #ffffff;
+  --fg: #0f172a;
+  --muted: #f0f8f6;
+  --muted-fg: #475569;
+  --border: #d5ede5;
+  --primary: #047857;
+  --on-primary: #ffffff;
+  --danger: #dc2626;
+  --kcal: #ea580c;
+  --protein: #2563eb;
+  --carbs: #ca8a04;
+  --fat: #db2777;
+  --water: #0891b2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #07130f;
+    --card: #0e1d18;
+    --fg: #e7f5ef;
+    --muted: #132722;
+    --muted-fg: #9fb3ac;
+    --border: #1e3530;
+    --primary: #34d399;
+    --on-primary: #052e22;
+    --danger: #f87171;
+    --kcal: #fb923c;
+    --protein: #60a5fa;
+    --carbs: #facc15;
+    --fat: #f472b6;
+    --water: #22d3ee;
+  }
+}
+
+body {
+  @apply bg-bg text-fg font-sans antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}

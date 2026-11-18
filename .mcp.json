@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "food-tracker": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "C:/Focus/Body-Buiulder/New_version_tracker/node_modules/tsx/dist/cli.mjs",
+        "C:/Focus/Body-Buiulder/New_version_tracker/mcp/server.ts"
+      ],
+      "env": {}
+    }
+  }
+}
