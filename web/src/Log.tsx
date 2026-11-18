@@ -61,18 +61,21 @@ function EntryRow({ entry, onUpdate, onDelete }: { entry: Entry; onUpdate: (id: 
       <label htmlFor={id} className="sr-only">
         Servings of {entry.food.name}
       </label>
-      <input
-        id={id}
-        type="number"
-        inputMode="decimal"
-        step="0.25"
-        min={0}
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-        className={`${inputCls} w-20 text-center`}
-      />
+      {/* inputCls is w-full, so the wrapper sets the width */}
+      <div className="w-20 shrink-0">
+        <input
+          id={id}
+          type="number"
+          inputMode="decimal"
+          step="0.25"
+          min={0}
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+          className={`${inputCls} text-center`}
+        />
+      </div>
       <span className="hidden text-xs text-muted-fg sm:inline">srv</span>
       <Button variant="icon" aria-label={`Remove ${entry.food.name}`} onClick={() => onDelete(entry.id)} className="hover:text-danger">
         <Trash2 size={18} aria-hidden />

@@ -32,7 +32,8 @@ const app = Fastify({ trustProxy: !isLocal });
 
 // HTTP Basic auth on everything except the health check and the MCP route (which checks its own secret).
 app.addHook("onRequest", async (req, reply) => {
-  if (!PASSWORD || req.url === "/healthz" || req.url.startsWith("/mcp/")) return;
+  // /.well-known/ must 404 (not 401): Claude connectors probe it for OAuth and treat 401 as "sign-in required".
+  if (!PASSWORD || req.url === "/healthz" || req.url.startsWith("/mcp/") || req.url.startsWith("/.well-known/")) return;
   const given = req.headers.authorization ?? "";
   const pass = given.startsWith("Basic ") ? Buffer.from(given.slice(6), "base64").toString().split(":").slice(1).join(":") : "";
   if (!sameSecret(pass, PASSWORD)) {
@@ -168,7 +169,7 @@ const dist = resolve("dist");
 if (existsSync(dist)) {
   app.register(fastifyStatic, { root: dist });
   app.setNotFoundHandler((req, reply) =>
-    req.method === "GET" && !req.url.startsWith("/api/") ? reply.sendFile("index.html") : reply.code(404).send({ error: "Not found" }),
+    req.method === "GET" && !req.url.startsWith("/api/") && !req.url.startsWith("/.well-known/") ? reply.sendFile("index.html") : reply.code(404).send({ error: "Not found" }),
   );
 }
 
