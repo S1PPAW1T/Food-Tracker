@@ -1,9 +1,9 @@
 import Fastify, { type FastifyError } from "fastify";
-import fastifyStatic from "@fastify/static";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFile } from "node:fs/promises";
+import { extname, join, resolve, sep } from "node:path";
 import { z, ZodError } from "zod";
 import { sql } from "./db.js";
 import { createMcpServer } from "../mcp/tools.js";
@@ -166,12 +166,26 @@ if (MCP_SECRET) {
 }
 
 // Production: serve the built web app (npm run build) from the same server.
+// Plain fs instead of @fastify/static: its ESM-only dependency crashes Vercel's function loader.
 const dist = resolve("dist");
+const TYPES: Record<string, string> = {
+  ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml",
+  ".png": "image/png", ".ico": "image/x-icon", ".json": "application/json", ".woff2": "font/woff2",
+};
 if (existsSync(dist)) {
-  app.register(fastifyStatic, { root: dist });
-  app.setNotFoundHandler((req, reply) =>
-    req.method === "GET" && !req.url.startsWith("/api/") && !req.url.startsWith("/.well-known/") ? reply.sendFile("index.html") : reply.code(404).send({ error: "Not found" }),
-  );
+  app.setNotFoundHandler(async (req, reply) => {
+    if (req.method !== "GET" || req.url.startsWith("/api/") || req.url.startsWith("/.well-known/")) {
+      return reply.code(404).send({ error: "Not found" });
+    }
+    let file = join(dist, decodeURIComponent(new URL(req.url, "http://x").pathname));
+    // Anything outside dist, unknown, or missing falls back to the SPA's index.html.
+    if (!file.startsWith(dist + sep) || !TYPES[extname(file)] || !existsSync(file)) file = join(dist, "index.html");
+    const hashed = file.startsWith(join(dist, "assets") + sep); // Vite puts content hashes in these names
+    return reply
+      .type(TYPES[extname(file)])
+      .header("cache-control", hashed ? "public, max-age=31536000, immutable" : "no-cache")
+      .send(await readFile(file));
+  });
 }
 
 export { app, HOST, MCP_SECRET };
