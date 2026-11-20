@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Salad, Target, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut, Salad, Target, X } from "lucide-react";
 import { totals } from "../../shared/calc";
 import type { Day, Goals } from "../../shared/schemas";
 import { api, errMsg } from "./api";
@@ -76,6 +76,9 @@ export default function App() {
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Food Tracker</h1>
           <Button variant="ghost" className="ml-auto" onClick={() => setGoalsOpen(true)} disabled={!goals}>
             <Target size={18} aria-hidden /> Goals
+          </Button>
+          <Button variant="icon" aria-label="Sign out" title="Sign out" onClick={() => api.logout().finally(() => location.reload())}>
+            <LogOut size={18} aria-hidden />
           </Button>
         </div>
       </header>

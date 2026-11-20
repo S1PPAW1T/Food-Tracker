@@ -50,7 +50,7 @@ One serverless function (`api/index.ts`) serves the web app, the API and the MCP
 2. On https://vercel.com: **Add New → Project**, import the repo. Leave the build settings as they are (`vercel.json` sets them).
 3. Before deploying, add these Environment Variables:
    - `DATABASE_URL`: your Supabase **Transaction pooler** string (port **6543**), not the Session pooler
-   - `APP_PASSWORD`: 12+ characters; the browser asks for it (any username)
+   - `APP_PASSWORD`: 12+ characters; entered on the sign-in page
    - `MCP_SECRET`: generate with `node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`
    - `APP_TZ`: `Asia/Bangkok` (so "today" in Claude matches your day)
 4. Open `https://<your-project>.vercel.app`.

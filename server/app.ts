@@ -27,20 +27,35 @@ if (MCP_SECRET && !/^[A-Za-z0-9_-]{32,}$/.test(MCP_SECRET)) {
 
 const sameSecret = (a: string, b: string) =>
   timingSafeEqual(createHash("sha256").update(a).digest(), createHash("sha256").update(b).digest());
-const AUTH_HEADER = `Basic ${Buffer.from(`app:${PASSWORD}`).toString("base64")}`;
+// Stateless session (works on serverless): the cookie holds a hash derived from the password,
+// so changing APP_PASSWORD signs everyone out.
+const SESSION = createHash("sha256").update(`food-tracker-session:${PASSWORD}`).digest("hex");
+const SESSION_COOKIE = `session=${SESSION}`;
+const cookieAttrs = `Path=/; HttpOnly; SameSite=Lax${isLocal ? "" : "; Secure"}`;
 
 const app = Fastify({ trustProxy: !isLocal });
 
-// HTTP Basic auth on everything except the health check and the MCP route (which checks its own secret).
+// Login cookie required for every /api route except /api/login. The web page itself holds no data, so it is
+// public (it shows the sign-in form); the MCP route checks its own secret; /.well-known/ must stay 404, not 401,
+// because Claude connectors probe it for OAuth and treat 401 as "sign-in required".
 app.addHook("onRequest", async (req, reply) => {
-  // /.well-known/ must 404 (not 401): Claude connectors probe it for OAuth and treat 401 as "sign-in required".
-  if (!PASSWORD || req.url === "/healthz" || req.url.startsWith("/mcp/") || req.url.startsWith("/.well-known/")) return;
-  const given = req.headers.authorization ?? "";
-  const pass = given.startsWith("Basic ") ? Buffer.from(given.slice(6), "base64").toString().split(":").slice(1).join(":") : "";
-  if (!sameSecret(pass, PASSWORD)) {
-    return reply.code(401).header("www-authenticate", 'Basic realm="Food Tracker", charset="UTF-8"').send({ error: "Login required" });
-  }
+  const route = req.routeOptions.url ?? ""; // the matched route pattern, so URL-encoding tricks can't skip this
+  if (!PASSWORD || !route.startsWith("/api/") || route === "/api/login") return;
+  const given = /(?:^|;\s*)session=([^;]*)/.exec(req.headers.cookie ?? "")?.[1] ?? "";
+  if (!sameSecret(given, SESSION)) return reply.code(401).send({ error: "Login required" });
 });
+
+app.post("/api/login", async (req, reply) => {
+  const { password } = z.object({ password: z.string().max(200) }).parse(req.body);
+  if (!sameSecret(password, PASSWORD)) return reply.code(401).send({ error: "Wrong password" });
+  return reply.header("set-cookie", `${SESSION_COOKIE}; ${cookieAttrs}; Max-Age=${90 * 86400}`).code(204).send();
+});
+
+app.post("/api/logout", async (_req, reply) =>
+  reply.header("set-cookie", `session=; ${cookieAttrs}; Max-Age=0`).code(204).send(),
+);
+
+app.get("/api/session", async () => ({ ok: true }));
 
 app.get("/healthz", async () => ({ ok: true }));
 
@@ -147,7 +162,7 @@ if (MCP_SECRET) {
   app.post("/mcp/:secret", async (req, reply) => {
     if (!sameSecret((req.params as { secret: string }).secret, MCP_SECRET)) return reply.code(404).send({ error: "Not found" });
     const server = createMcpServer(async (path, method, json) => {
-      const res = await app.inject({ method: method as "GET", url: `/api${path}`, payload: json as object, headers: { authorization: AUTH_HEADER } });
+      const res = await app.inject({ method: method as "GET", url: `/api${path}`, payload: json as object, headers: { cookie: SESSION_COOKIE } });
       return { status: res.statusCode, body: res.body };
     });
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });

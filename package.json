@@ -30,5 +30,8 @@
     "tsx": "^4.23.15",
     "typescript": "^5.7.2",
     "vite": "^6.0.7"
+  },
+  "overrides": {
+    "light-my-request": "6.6.0"
   }
 }

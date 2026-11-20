@@ -6,6 +6,8 @@ async function req<T>(path: string, method = "GET", json?: unknown): Promise<T> 
     headers: json === undefined ? undefined : { "content-type": "application/json" },
     body: json === undefined ? undefined : JSON.stringify(json),
   });
+  // Session expired mid-use: reload so the app shows the sign-in page.
+  if (res.status === 401 && path !== "/login") location.reload();
   if (!res.ok) {
     const body = (await res.json().catch(() => ({}))) as { error?: string };
     throw new Error(body.error ?? `Request failed (${res.status})`);
@@ -14,6 +16,8 @@ async function req<T>(path: string, method = "GET", json?: unknown): Promise<T> 
 }
 
 export const api = {
+  login: (password: string) => req<void>("/login", "POST", { password }),
+  logout: () => req<void>("/logout", "POST"),
   foods: (q: string) => req<Food[]>(`/foods?q=${encodeURIComponent(q)}`),
   addFood: (f: NewFood) => req<Food>("/foods", "POST", f),
   day: (date: string) => req<Day>(`/day/${date}`),
