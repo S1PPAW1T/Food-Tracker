@@ -7,7 +7,8 @@ if (!url) {
   process.exit(1);
 }
 
-export const sql = postgres(url, { ssl: "require", max: 5 });
+// prepare: false so the Supabase Transaction pooler (needed for serverless) works too.
+export const sql = postgres(url, { ssl: "require", max: 5, prepare: false });
 
 export async function initDb() {
   await sql.unsafe(`

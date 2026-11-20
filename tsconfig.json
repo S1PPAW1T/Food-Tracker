@@ -11,5 +11,5 @@
     "isolatedModules": true,
     "types": ["node", "vite/client"]
   },
-  "include": ["web/src", "server", "shared", "mcp", "vite.config.ts"]
+  "include": ["web/src", "api", "server", "shared", "mcp", "vite.config.ts"]
 }

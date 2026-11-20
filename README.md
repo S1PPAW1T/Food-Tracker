@@ -42,21 +42,23 @@ Tools: `search_foods`, `log_food` (servings or grams), `add_water`, `get_day_sum
 
 Example: "I had khao man gai for lunch and 500 ml of water" → Claude searches, logs it, and shows the day's totals.
 
-## Deploy (Render, free)
+## Deploy (Vercel, free Hobby plan)
 
-One web service serves the web app, the API and the MCP endpoint (`render.yaml`).
+One serverless function (`api/index.ts`) serves the web app, the API and the MCP endpoint (`vercel.json`).
 
 1. Push this repo to GitHub.
-2. On https://render.com: **New → Blueprint**, pick the repo. Render reads `render.yaml`.
-3. Fill in the secret env vars when asked:
-   - `DATABASE_URL`: your Supabase Session pooler string
+2. On https://vercel.com: **Add New → Project**, import the repo. Leave the build settings as they are (`vercel.json` sets them).
+3. Before deploying, add these Environment Variables:
+   - `DATABASE_URL`: your Supabase **Transaction pooler** string (port **6543**), not the Session pooler
    - `APP_PASSWORD`: 12+ characters; the browser asks for it (any username)
    - `MCP_SECRET`: generate with `node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`
-4. Open `https://<your-service>.onrender.com`.
+   - `APP_TZ`: `Asia/Bangkok` (so "today" in Claude matches your day)
+4. Open `https://<your-project>.vercel.app`.
 5. Claude (web + mobile): **Settings → Connectors → Add custom connector**, URL
-   `https://<your-service>.onrender.com/mcp/<MCP_SECRET>`. Treat that URL like a password.
+   `https://<your-project>.vercel.app/mcp/<MCP_SECRET>`. Treat that URL like a password.
 
-The free plan sleeps after ~15 minutes idle; the first request after that takes up to a minute.
+The first request after a quiet period takes a second or two while the function starts.
+`npm start` still runs the app as a normal server on any other host.
 
 ## Notes
 

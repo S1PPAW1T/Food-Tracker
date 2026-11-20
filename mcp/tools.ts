@@ -8,8 +8,8 @@ import type { Day, Food, Goals } from "../shared/schemas";
 /** Sends one request to /api<path> and returns the status and raw body. */
 export type Send = (path: string, method: string, json?: unknown) => Promise<{ status: number; body: string }>;
 
-// Server-local date; set TZ (e.g. Asia/Bangkok) in the cloud so "today" matches the user's day.
-const today = () => new Date().toLocaleDateString("en-CA");
+// Set APP_TZ (e.g. Asia/Bangkok) in the cloud so "today" matches the user's day; Vercel reserves TZ.
+const today = () => new Date().toLocaleDateString("en-CA", { timeZone: process.env.APP_TZ || undefined });
 const dateArg = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/)
