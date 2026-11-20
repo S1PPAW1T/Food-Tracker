@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { progress, round1, totals } from "./calc";
+import { progress, round1, totals } from "./calc.js";
 
 const rice = { kcal: 205, protein: 4.3, carbs: 44.5, fat: 0.4 };
 const egg = { kcal: 72, protein: 6.3, carbs: 0.4, fat: 4.8 };

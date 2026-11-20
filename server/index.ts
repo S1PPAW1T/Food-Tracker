@@ -1,6 +1,6 @@
 // Long-running server (local dev, or any host that runs `npm start`). Vercel uses api/index.ts instead.
-import { app, HOST, MCP_SECRET } from "./app";
-import { initDb } from "./db";
+import { app, HOST, MCP_SECRET } from "./app.js";
+import { initDb } from "./db.js";
 
 const port = Number(process.env.PORT ?? 3001);
 initDb()

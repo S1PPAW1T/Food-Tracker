@@ -2,8 +2,8 @@
 // so the same tools run locally over stdio (mcp/server.ts) and in the cloud over HTTP (server/index.ts).
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { progress, round1, scale, totals } from "../shared/calc";
-import type { Day, Food, Goals } from "../shared/schemas";
+import { progress, round1, scale, totals } from "../shared/calc.js";
+import type { Day, Food, Goals } from "../shared/schemas.js";
 
 /** Sends one request to /api<path> and returns the status and raw body. */
 export type Send = (path: string, method: string, json?: unknown) => Promise<{ status: number; body: string }>;

@@ -1,7 +1,7 @@
 // Vercel serverless entry: vercel.json rewrites every path here; Fastify routes it (web app, API, MCP).
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { app } from "../server/app";
-import { initDb } from "../server/db";
+import { app } from "../server/app.js";
+import { initDb } from "../server/db.js";
 
 let ready: Promise<unknown> | undefined;
 

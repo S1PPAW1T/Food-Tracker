@@ -5,9 +5,9 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { z, ZodError } from "zod";
-import { sql } from "./db";
-import { createMcpServer } from "../mcp/tools";
-import { DateStr, EntryUpdate, Goals, NewEntry, NewFood, Water, type Day, type Food } from "../shared/schemas";
+import { sql } from "./db.js";
+import { createMcpServer } from "../mcp/tools.js";
+import { DateStr, EntryUpdate, Goals, NewEntry, NewFood, Water, type Day, type Food } from "../shared/schemas.js";
 
 const HOST = process.env.HOST ?? "127.0.0.1";
 const PASSWORD = process.env.APP_PASSWORD ?? "";

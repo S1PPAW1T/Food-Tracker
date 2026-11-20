@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import { SEED_FOODS } from "./seed";
+import { SEED_FOODS } from "./seed.js";
 
 const url = process.env.DATABASE_URL;
 if (!url) {

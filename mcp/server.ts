@@ -1,7 +1,7 @@
 // Local MCP server over stdio (Claude Code / Claude Desktop on this computer).
 // Forwards to the running app's API; start the app with `npm run dev` first.
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { createMcpServer } from "./tools";
+import { createMcpServer } from "./tools.js";
 
 const API = process.env.FOOD_API_URL ?? "http://127.0.0.1:3001/api";
 
